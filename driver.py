@@ -6,6 +6,7 @@
 # 
 # 
 
+import numpy as np
 
 #Define goal state
 goal_state = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -29,18 +30,20 @@ class Node:
 
     
     #Generate New Nodes from Actions
-    def generate_nodes(self):
+    def generate_children(self):
         #create empty array to store next states
         next_states = []
 
         #find the 0 in the current state
         zero = self.state.index(0)
 
-        
+        ##Only generate children nodes for states that are reachable
+        ##Geneterate using [‘Up’, ‘Down’, ‘Left’, ‘Right’]  order given
+
         #UP
         if(zero not in top_row):
             #Swap the value above zero with zero using a new state
-            new_state = self.state
+            new_state = self.state.copy()
             temp = new_state[zero-3]
             new_state[zero-3] = 0
             new_state[zero] = temp
@@ -51,7 +54,7 @@ class Node:
         #DOWN
         if(zero not in bottom_row):
             #Swap the value below zero with zero using a new state
-            new_state = self.state
+            new_state = self.state.copy()
             temp = new_state[zero+3]
             new_state[zero+3] = 0
             new_state[zero] = temp
@@ -62,7 +65,7 @@ class Node:
         #LEFT
         if(zero not in left_side):
             #Swap the value next to zero with zero using a new state
-            new_state = self.state
+            new_state = self.state.copy()
             temp = new_state[zero-1]
             new_state[zero-1] = 0
             new_state[zero] = temp
@@ -73,7 +76,7 @@ class Node:
         #RIGHT
         if(zero not in right_side):
             #Swap the value next to zero with zero using a new state
-            new_state = self.state
+            new_state = self.state.copy()
             temp = new_state[zero+1]
             new_state[zero+1] = 0
             new_state[zero] = temp
@@ -81,19 +84,38 @@ class Node:
             RIGHT = Node(new_state, self, "right", self.depth + 1, 1, self.path_cost +1)
             next_states.append(RIGHT)
 
+    def ManhattanDistance(self):
+        total = 0
+        for number in self.state:
+            number_index = self.state.index(number)
+            goal_state_index = goal_state.index(number)
 
+    def solver(self, method, starting_state, goal_state):
+        print("In SOLVER method", method)
+        visited_nodes = [starting_state]
+        #__init__(self, state, parent, action, depth, cost, total_path_cost)
+        queue = [Node[starting_state, None, None, 0, 0, 0]]
+        nodes_popped = 0
+        max_queue = 0
 
-    def BFS(self, goal_state):
-        start = time.time()
+        while(len(queue)>0):
+            #Update queue information
+            max_queue = max(len(queue), max_queue)
+            current_node = queue.pop()
+            nodes_popped +=1
 
+            if current_node.state == goal_state:
+                return "GOAL STATE FOUND"
+            next_states = current_node.generate_children()
+            for node in next_states:
+                if node.state not in visited_nodes:
+                    visited_nodes.append(node.state)
+                    if method == "bfs":
+                        queue.insert(0, node )
+                        #Adding to the front of a queue gives FIFO Behavior
+                    else:
+                        queue.append(node)
+                        #Adding to the back of a queue gives LIFO Behavior
+            if method == "ast":
+                queue.sort(key = lambda node: node ManhattanDistance() + node.path_cost, reverse = True)
 
-        queue = [self]
-        queue_number_of_nodes_popped = [0]
-        queue_max_length = 1
-
-        depth_queue = [0]
-        path_cost_queue = [0]
-        visited = set([])
-
-        #while queue:
-            #update queue
