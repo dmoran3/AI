@@ -74,7 +74,6 @@ class GameManager:
             if turn == PLAYER_TURN:
                 print("Player's Turn: ", end="")
                 move = self.playerAI.getMove(gridCopy)
-                
                 print(actionDic[move])
 
                 # If move is valid, attempt to move the grid
@@ -104,7 +103,7 @@ class GameManager:
             self.displayer.display(self.grid)
 
             # Exceeding the Time Allotted for Any Turn Terminates the Game
-            self.updateAlarm()
+            #self.updateAlarm()
             turn = 1 - turn
 
         return self.grid.getMaxTile()
