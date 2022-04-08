@@ -19,6 +19,10 @@ rewardGrid = np.array([
 # 	if the next agent is EXP: return min-value(state)
 class PlayerAI(BaseAI):
 
+	#Using one function for both Max-Val and Min-Val from the lectures
+	#switches between the two based on depth parameter
+ 
+	#
 	def expectiminimax(self, grid, depth, dir = None):
 		#print(time.time())
 		if(depth < 0):
@@ -39,14 +43,107 @@ class PlayerAI(BaseAI):
 			available_cells = grid.getAvailableCells()
 			for cell in available_cells:
 				grid.insertTile(cell,2)
-				V += 1.0/len(available_cells) * self.expectiminimax(grid, depth - 0.5, dir)
+				f = self.expectiminimax(grid, depth - 0.5, dir)
+				if f < V: V = f
+				# V += 1.0/len(available_cells) * self.expectiminimax(grid, depth - 0.5, dir)
 				# V += 1.0/len(available_cells) * 0.9 * self.expectiminimax(grid, depth - 0.5, dir)
 				# grid.insertTile(cell, 4)
 				# V += 1.0/len(available_cells) * 0.1 * self.expectiminimax(grid, depth - 0.5, dir)
 				grid.insertTile(cell, 0)
 
 		return V
- 					
+ 				
+	def alphaBetaExpectiminimax(self, grid, depth, dir = None, alpha, beta):
+    		#print(time.time())
+		if(depth < 0):
+		#if(time.time() >= clock + 0.2):
+			#print(time.time())
+			return ((self.getHeuristicTileLayout(grid) * .5)+(self.getHeuristicSummation(grid) * .5))
+		if depth == int(depth):
+			#if player's turn
+			V = -math.inf
+			for dir in grid.getAvailableMoves():
+				new_board = grid.clone()
+				new_board.move(dir)
+				f = self.expectiminimax(new_board, depth - 0.5, dir, alpha, beta)
+				if f >= beta: V = f
+				alpha = max(alpha, V)
+		elif depth != int(depth):
+			#if adversary's turn
+			V = 0
+			available_cells = grid.getAvailableCells()
+			for cell in available_cells:
+				grid.insertTile(cell,2)
+				f = self.expectiminimax(grid, depth - 0.5, dir, alpha, beta)
+				if f < V: V = f
+				#V += 1.0/len(available_cells) * self.expectiminimax(grid, depth - 0.5, dir, alpha, beta)
+				# V += 1.0/len(available_cells) * 0.9 * self.expectiminimax(grid, depth - 0.5, dir)
+				# grid.insertTile(cell, 4)
+				# V += 1.0/len(available_cells) * 0.1 * self.expectiminimax(grid, depth - 0.5, dir)
+				grid.insertTile(cell, 0)
+
+		return V	
+
+# def expectiminimax(self, grid, depth, dir = None):
+#     		#print(time.time())
+# 		if(depth < 0):
+# 		#if(time.time() >= clock + 0.2):
+# 			#print(time.time())
+# 			return ((self.getHeuristicTileLayout(grid) * .5)+(self.getHeuristicSummation(grid) * .5))
+# 		if depth == int(depth):
+# 			#if player's turn
+# 			V = -math.inf
+# 			for dir in grid.getAvailableMoves():
+# 				new_board = grid.clone()
+# 				new_board.move(dir)
+# 				f = self.expectiminimax(new_board, depth - 0.5, dir)
+# 				if f > V: V = f
+# 		elif depth != int(depth):
+# 			#if adversary's turn
+# 			V = 0
+# 			available_cells = grid.getAvailableCells()
+# 			for cell in available_cells:
+# 				grid.insertTile(cell,2)
+# 				f = self.expectiminimax(grid, depth - 0.5, dir)
+# 				if f < V: V = f
+# 				# V += 1.0/len(available_cells) * self.expectiminimax(grid, depth - 0.5, dir)
+# 				# V += 1.0/len(available_cells) * 0.9 * self.expectiminimax(grid, depth - 0.5, dir)
+# 				# grid.insertTile(cell, 4)
+# 				# V += 1.0/len(available_cells) * 0.1 * self.expectiminimax(grid, depth - 0.5, dir)
+# 				grid.insertTile(cell, 0)
+
+# 		return V
+ 				
+#      def alphaBetaExpectiminimax(self, grid, depth, dir = None, alpha, beta):
+#     		#print(time.time())
+# 		if(depth < 0):
+# 		#if(time.time() >= clock + 0.2):
+# 			#print(time.time())
+# 			return ((self.getHeuristicTileLayout(grid) * .5)+(self.getHeuristicSummation(grid) * .5))
+# 		if depth == int(depth):
+# 			#if player's turn
+# 			V = -math.inf
+# 			for dir in grid.getAvailableMoves():
+# 				new_board = grid.clone()
+# 				new_board.move(dir)
+# 				f = self.expectiminimax(new_board, depth - 0.5, dir, alpha, beta)
+# 				if f >= beta: V = f
+# 				alpha = max(alpha, V)
+# 		elif depth != int(depth):
+# 			#if adversary's turn
+# 			V = 0
+# 			available_cells = grid.getAvailableCells()
+# 			for cell in available_cells:
+# 				grid.insertTile(cell,2)
+# 				f = self.expectiminimax(grid, depth - 0.5, dir, alpha, beta)
+# 				if f < V: V = f
+# 				#V += 1.0/len(available_cells) * self.expectiminimax(grid, depth - 0.5, dir, alpha, beta)
+# 				# V += 1.0/len(available_cells) * 0.9 * self.expectiminimax(grid, depth - 0.5, dir)
+# 				# grid.insertTile(cell, 4)
+# 				# V += 1.0/len(available_cells) * 0.1 * self.expectiminimax(grid, depth - 0.5, dir)
+# 				grid.insertTile(cell, 0)
+
+# 		return V	
 
 	# based on : Minimax and Expectimax Algorithm to Solve 2048 Ahmad Zaky
 	def alphabeta(self, state, depth, alpha, beta, turn):
